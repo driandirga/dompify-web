@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
@@ -6,8 +6,14 @@ import React from 'react';
 const CreateNewPassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { createNewPassword, loading, error } = useAuth();
+  const { createNewPassword,email, flowType, loading, error } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!email || flowType !== 'forgot_password') {
+      navigate('/login');
+    }
+  }, [email, flowType, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

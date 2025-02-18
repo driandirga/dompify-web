@@ -69,8 +69,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [flowType]);
 
   useEffect(() => {
-    if (authToken && (window.location.pathname === '/login' || window.location.pathname === '/register'|| window.location.pathname === '/validate-otp'
-    || window.location.pathname === '/create-new-password' || window.location.pathname === '/send-otp'
+    if (authToken && (window.location.pathname === '/login' || window.location.pathname === '/register' || window.location.pathname === '/send-otp'
+      || window.location.pathname === '/validate-otp' || window.location.pathname === '/create-new-password'
     )) {
       navigate('/dashboard');
     }
@@ -94,19 +94,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         { email, otp }
       );
 
-      const token = response.data.data?.token;
+      if (flowType === 'login') {
+        const token = response.data.data?.token;
+        if (token) {
+          localStorage.setItem('authToken', token);
+          setAuthToken(token);
 
-      if (token) {
-        localStorage.setItem('authToken', token);
-        setAuthToken(token);
-
-        if (flowType === 'login') {
           navigate('/dashboard');
-        } else if (flowType === 'forgot_password') {
-          navigate('/create-new-password');
+        } else {
+          console.error("Token tidak ditemukan dalam response");
         }
-      } else {
-        console.error("Token tidak ditemukan dalam response");
+      } else if (flowType === 'forgot_password') {
+        navigate('/create-new-password');
       }
     });
   };
@@ -121,6 +120,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     localStorage.removeItem('authToken');
     setAuthToken(null);
+    setFlowType(null);
     navigate('/login');
   };
 
